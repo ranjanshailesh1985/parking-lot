@@ -1,17 +1,16 @@
 package com.shailesh.parkinglot;
 
+import com.shailesh.parkinglot.parking.NoParkingAvailable;
 import com.shailesh.parkinglot.parking.ParkingLot;
 import com.shailesh.parkinglot.parking.model.ParkingReceipt;
 import com.shailesh.parkinglot.parking.model.VehicleType;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.time.LocalDateTime;
-import java.util.Random;
 
 @RunWith(JUnit4.class)
 public class ParkingIntegrationTest {
@@ -19,19 +18,16 @@ public class ParkingIntegrationTest {
     ParkingService mall;
     ParkingLot parkingLot;
 
-    @Before
-    public void setUp() {
+    @Test
+    public void shouldGenerateParkingTicketWithEntryTimeAndVehicleType() {
+        // given
         parkingLot = ParkinLotBuilder.builder()
                 .setCarSuvParkingSpot(80)
                 .setMotorCyclesScootersParkingSpot(100)
                 .setBusTruksParkingSpot(40)
                 .build();
         mall = new ParkingService(parkingLot);
-    }
 
-    @Test
-    public void shouldGenerateParkingTicketWithEntryTimeAndVehicleType() {
-        // given
         VehicleType firstVehicle = VehicleType.CAR_SUV;
         LocalDateTime firstVehicleEntryTime = LocalDateTime.now();
 
@@ -59,4 +55,30 @@ public class ParkingIntegrationTest {
 
     }
 
+
+    @Test
+    public void shouldFailToBookWhenNoSpotAvailable(){
+
+        // given
+        parkingLot = ParkinLotBuilder.builder()
+                .setCarSuvParkingSpot(1)
+                .build();
+        mall = new ParkingService(parkingLot);
+        VehicleType carSuv = VehicleType.CAR_SUV;
+        mall.park(carSuv, LocalDateTime.now());
+        LocalDateTime entryTime = LocalDateTime.now();
+
+        // when
+        try{
+            mall.park(carSuv, entryTime);
+            throw new RuntimeException(String.format("%s Test failed", "shouldFailToBookWhenNoSpotAvailable()"));
+        } catch(NoParkingAvailable npa){
+            // then
+            MatcherAssert.assertThat(npa.getMessage(), IsEqual.equalTo("Parking Spot of type "+carSuv.name()+" is not available."));
+        }
+    }
+
+    public void shouldUnpark(){
+
+    }
 }

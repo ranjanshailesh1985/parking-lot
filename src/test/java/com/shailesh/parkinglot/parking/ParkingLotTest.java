@@ -4,7 +4,6 @@ import com.shailesh.parkinglot.ParkinLotBuilder;
 import com.shailesh.parkinglot.parking.model.VehicleType;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -18,17 +17,12 @@ public class ParkingLotTest {
 
     ParkingLot parkingLot;
 
-    @Before
-    public void setUp(){
-        parkingLot = ParkinLotBuilder.builder()
-                .setCarSuvParkingSpot(2)
-                .setBusTruksParkingSpot(3)
-                .build();
-    }
-
     @Test
     public void shouldSearchForAvailableParkingSpotForAVehicleTypeAndReturnSpotId(){
-
+        // given
+        parkingLot = ParkinLotBuilder.builder()
+                .setCarSuvParkingSpot(2)
+                .build();
         // when
         Integer availableSpotIndex = parkingLot.findAvailableSpot(VehicleType.CAR_SUV);
 
@@ -40,6 +34,10 @@ public class ParkingLotTest {
     @Test
     public void shouldParkGivenSpotIdIsAvailable(){
         // given
+        parkingLot = ParkinLotBuilder.builder()
+                .setCarSuvParkingSpot(2)
+                .build();
+
         VehicleType vehicleType = VehicleType.CAR_SUV;
         Integer availableSpot = parkingLot.findAvailableSpot(vehicleType);
 
@@ -49,12 +47,17 @@ public class ParkingLotTest {
         // then
         MatcherAssert.assertThat(parkingLot.availableParkingSpotFor(vehicleType), IsEqual.equalTo(1));
         MatcherAssert.assertThat(parkingLot.IsSpotAvailable(availableSpot), IsEqual.equalTo(false));
-
+        MatcherAssert.assertThat(parkingLot.findAvailableSpot(vehicleType), IsEqual.equalTo(1));
     }
 
     @Test
     public void shouldThrowNoSpotAvailableException(){
         // given
+        parkingLot = ParkinLotBuilder.builder()
+                .setCarSuvParkingSpot(2)
+                .build();
+
+
         VehicleType vehicleType = VehicleType.CAR_SUV;
         Integer firstAvailableSpot = parkingLot.findAvailableSpot(vehicleType);
         parkingLot.bookSpot(firstAvailableSpot, vehicleType);
@@ -63,7 +66,6 @@ public class ParkingLotTest {
         parkingLot.bookSpot(secondAvailableSpot, vehicleType);
 
         // when
-
         try{
             parkingLot.findAvailableSpot(VehicleType.CAR_SUV);
             throw new RuntimeException(String.format("%s Test failed", "shouldThrowNoSpotAvailableException()"));
@@ -77,6 +79,10 @@ public class ParkingLotTest {
     @Test
     public void shouldThrowBookingFailedExceptionIfNotAbleToBook() throws InterruptedException, ExecutionException {
         // given
+        parkingLot = ParkinLotBuilder.builder()
+                .setCarSuvParkingSpot(2)
+                .build();
+
         VehicleType vehicleType = VehicleType.CAR_SUV;
         Integer firstAvailableSpot = parkingLot.findAvailableSpot(vehicleType);
         parkingLot.bookSpot(firstAvailableSpot, vehicleType);
