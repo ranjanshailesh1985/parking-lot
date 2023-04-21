@@ -22,4 +22,7 @@ public class Spot {
     public void occupied() {
         this.available = false;
     }
+    public void free() {
+        this.available = true;
+    }
 }

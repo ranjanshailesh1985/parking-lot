@@ -1,10 +1,10 @@
 package com.shailesh.parkinglot.parking;
 
-import com.shailesh.parkinglot.ParkinLotBuilder;
+import com.shailesh.parkinglot.parking.exceptions.BookingNotPossible;
+import com.shailesh.parkinglot.parking.exceptions.NoParkingAvailable;
 import com.shailesh.parkinglot.parking.model.VehicleType;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -18,17 +18,12 @@ public class ParkingLotTest {
 
     ParkingLot parkingLot;
 
-    @Before
-    public void setUp(){
-        parkingLot = ParkinLotBuilder.builder()
-                .setCarSuvParkingSpot(2)
-                .setBusTruksParkingSpot(3)
-                .build();
-    }
-
     @Test
     public void shouldSearchForAvailableParkingSpotForAVehicleTypeAndReturnSpotId(){
-
+        // given
+        parkingLot = ParkingLotBuilder.builder()
+                .setCarSuvParkingSpot(2)
+                .build();
         // when
         Integer availableSpotIndex = parkingLot.findAvailableSpot(VehicleType.CAR_SUV);
 
@@ -40,6 +35,10 @@ public class ParkingLotTest {
     @Test
     public void shouldParkGivenSpotIdIsAvailable(){
         // given
+        parkingLot = ParkingLotBuilder.builder()
+                .setCarSuvParkingSpot(2)
+                .build();
+
         VehicleType vehicleType = VehicleType.CAR_SUV;
         Integer availableSpot = parkingLot.findAvailableSpot(vehicleType);
 
@@ -49,12 +48,17 @@ public class ParkingLotTest {
         // then
         MatcherAssert.assertThat(parkingLot.availableParkingSpotFor(vehicleType), IsEqual.equalTo(1));
         MatcherAssert.assertThat(parkingLot.IsSpotAvailable(availableSpot), IsEqual.equalTo(false));
-
+        MatcherAssert.assertThat(parkingLot.findAvailableSpot(vehicleType), IsEqual.equalTo(1));
     }
 
     @Test
     public void shouldThrowNoSpotAvailableException(){
         // given
+        parkingLot = ParkingLotBuilder.builder()
+                .setCarSuvParkingSpot(2)
+                .build();
+
+
         VehicleType vehicleType = VehicleType.CAR_SUV;
         Integer firstAvailableSpot = parkingLot.findAvailableSpot(vehicleType);
         parkingLot.bookSpot(firstAvailableSpot, vehicleType);
@@ -63,7 +67,6 @@ public class ParkingLotTest {
         parkingLot.bookSpot(secondAvailableSpot, vehicleType);
 
         // when
-
         try{
             parkingLot.findAvailableSpot(VehicleType.CAR_SUV);
             throw new RuntimeException(String.format("%s Test failed", "shouldThrowNoSpotAvailableException()"));
@@ -77,6 +80,10 @@ public class ParkingLotTest {
     @Test
     public void shouldThrowBookingFailedExceptionIfNotAbleToBook() throws InterruptedException, ExecutionException {
         // given
+        parkingLot = ParkingLotBuilder.builder()
+                .setCarSuvParkingSpot(2)
+                .build();
+
         VehicleType vehicleType = VehicleType.CAR_SUV;
         Integer firstAvailableSpot = parkingLot.findAvailableSpot(vehicleType);
         parkingLot.bookSpot(firstAvailableSpot, vehicleType);
@@ -84,6 +91,7 @@ public class ParkingLotTest {
         final Integer secondAvailableSpot = parkingLot.findAvailableSpot(vehicleType);
         final Integer thirdAvailableSpot = parkingLot.findAvailableSpot(vehicleType);
         ExecutorService executorService = Executors.newFixedThreadPool(2);
+        // TODO: fix the test to reproduce error, instead of running as fork
         List<Callable<BookingNotPossible>> callableList = Arrays.asList(
                 booking(vehicleType, secondAvailableSpot),
                 booking(vehicleType, thirdAvailableSpot)
@@ -110,5 +118,24 @@ public class ParkingLotTest {
         };
     }
 
+    @Test
+    public void shouldUnParkGivenAValidTicket(){
+        // given
+        parkingLot = ParkingLotBuilder.builder()
+                        .setCarSuvParkingSpot(2)
+                        .build();
+
+        VehicleType type = VehicleType.CAR_SUV;
+        Integer availableSpot = parkingLot.findAvailableSpot(type);
+        parkingLot.bookSpot(availableSpot, type);
+        Integer spotNumber = availableSpot;
+
+        // when
+        parkingLot.freeSpot(spotNumber);
+
+        // then
+        MatcherAssert.assertThat(parkingLot.availableParkingSpotFor(type), IsEqual.equalTo(2));
+        MatcherAssert.assertThat(parkingLot.findAvailableSpot(type), IsEqual.equalTo(0));
+    }
 
 }

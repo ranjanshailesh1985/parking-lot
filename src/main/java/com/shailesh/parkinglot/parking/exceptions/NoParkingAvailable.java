@@ -1,4 +1,4 @@
-package com.shailesh.parkinglot.parking;
+package com.shailesh.parkinglot.parking.exceptions;
 
 public class NoParkingAvailable extends RuntimeException {
 
