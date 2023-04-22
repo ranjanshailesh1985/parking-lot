@@ -1,37 +1,36 @@
-package com.shailesh.parkinglot;
+package com.shailesh.parkinglot.parking;
 
-import com.shailesh.parkinglot.parking.ParkingLot;
 import com.shailesh.parkinglot.parking.model.Spot;
 import com.shailesh.parkinglot.parking.model.VehicleType;
 
 import java.util.HashMap;
 
-public class ParkinLotBuilder {
+public class ParkingLotBuilder {
 
     private HashMap<VehicleType, Integer> vehicleTypeSpotMap = new HashMap<>();
 
     private HashMap<Integer, Spot> spotIndexMap = new HashMap<>();
 
-    private ParkinLotBuilder(){}
+    private ParkingLotBuilder(){}
 
-    public static ParkinLotBuilder builder() {
-        return new ParkinLotBuilder();
+    public static ParkingLotBuilder builder() {
+        return new ParkingLotBuilder();
     }
 
 
-    public ParkinLotBuilder setCarSuvParkingSpot(Integer carSuvParkingSpot) {
+    public ParkingLotBuilder setCarSuvParkingSpot(Integer carSuvParkingSpot) {
         vehicleTypeSpotMap.put(VehicleType.CAR_SUV, carSuvParkingSpot);
         createSpot(VehicleType.CAR_SUV, carSuvParkingSpot);
         return this;
     }
 
-    public ParkinLotBuilder setMotorCyclesScootersParkingSpot(Integer motorCyclesScootersParkingSpot) {
+    public ParkingLotBuilder setMotorCyclesScootersParkingSpot(Integer motorCyclesScootersParkingSpot) {
         vehicleTypeSpotMap.put(VehicleType.MOTORCYCLE_SCOOTER, motorCyclesScootersParkingSpot);
         createSpot(VehicleType.MOTORCYCLE_SCOOTER, motorCyclesScootersParkingSpot);
         return this;
     }
 
-    public ParkinLotBuilder setBusTruksParkingSpot(Integer busTruksParkingSpot) {
+    public ParkingLotBuilder setBusTruksParkingSpot(Integer busTruksParkingSpot) {
         vehicleTypeSpotMap.put(VehicleType.BUS_TRUCK, busTruksParkingSpot);
         createSpot(VehicleType.BUS_TRUCK, busTruksParkingSpot);
         return this;

@@ -1,5 +1,7 @@
 package com.shailesh.parkinglot.parking;
 
+import com.shailesh.parkinglot.parking.exceptions.BookingNotPossible;
+import com.shailesh.parkinglot.parking.exceptions.NoParkingAvailable;
 import com.shailesh.parkinglot.parking.model.Spot;
 import com.shailesh.parkinglot.parking.model.VehicleType;
 
@@ -57,5 +59,12 @@ public class ParkingLot {
                 vehicleTypeSpotMap.put(spot.getType(), availableSpots - 1);
             }
         }
+    }
+
+    public void freeSpot(Integer spotNumber) {
+        Spot spot = spotIndexMap.get(spotNumber);
+        spot.free();
+        Integer availableSpot = vehicleTypeSpotMap.get(spot.getType());
+        vehicleTypeSpotMap.put(spot.getType(), availableSpot+1);
     }
 }

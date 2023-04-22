@@ -1,6 +1,7 @@
 package com.shailesh.parkinglot.parking;
 
-import com.shailesh.parkinglot.ParkinLotBuilder;
+import com.shailesh.parkinglot.parking.exceptions.BookingNotPossible;
+import com.shailesh.parkinglot.parking.exceptions.NoParkingAvailable;
 import com.shailesh.parkinglot.parking.model.VehicleType;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -20,7 +21,7 @@ public class ParkingLotTest {
     @Test
     public void shouldSearchForAvailableParkingSpotForAVehicleTypeAndReturnSpotId(){
         // given
-        parkingLot = ParkinLotBuilder.builder()
+        parkingLot = ParkingLotBuilder.builder()
                 .setCarSuvParkingSpot(2)
                 .build();
         // when
@@ -34,7 +35,7 @@ public class ParkingLotTest {
     @Test
     public void shouldParkGivenSpotIdIsAvailable(){
         // given
-        parkingLot = ParkinLotBuilder.builder()
+        parkingLot = ParkingLotBuilder.builder()
                 .setCarSuvParkingSpot(2)
                 .build();
 
@@ -53,7 +54,7 @@ public class ParkingLotTest {
     @Test
     public void shouldThrowNoSpotAvailableException(){
         // given
-        parkingLot = ParkinLotBuilder.builder()
+        parkingLot = ParkingLotBuilder.builder()
                 .setCarSuvParkingSpot(2)
                 .build();
 
@@ -79,7 +80,7 @@ public class ParkingLotTest {
     @Test
     public void shouldThrowBookingFailedExceptionIfNotAbleToBook() throws InterruptedException, ExecutionException {
         // given
-        parkingLot = ParkinLotBuilder.builder()
+        parkingLot = ParkingLotBuilder.builder()
                 .setCarSuvParkingSpot(2)
                 .build();
 
@@ -90,6 +91,7 @@ public class ParkingLotTest {
         final Integer secondAvailableSpot = parkingLot.findAvailableSpot(vehicleType);
         final Integer thirdAvailableSpot = parkingLot.findAvailableSpot(vehicleType);
         ExecutorService executorService = Executors.newFixedThreadPool(2);
+        // TODO: fix the test to reproduce error, instead of running as fork
         List<Callable<BookingNotPossible>> callableList = Arrays.asList(
                 booking(vehicleType, secondAvailableSpot),
                 booking(vehicleType, thirdAvailableSpot)
@@ -116,5 +118,24 @@ public class ParkingLotTest {
         };
     }
 
+    @Test
+    public void shouldUnParkGivenAValidTicket(){
+        // given
+        parkingLot = ParkingLotBuilder.builder()
+                        .setCarSuvParkingSpot(2)
+                        .build();
+
+        VehicleType type = VehicleType.CAR_SUV;
+        Integer availableSpot = parkingLot.findAvailableSpot(type);
+        parkingLot.bookSpot(availableSpot, type);
+        Integer spotNumber = availableSpot;
+
+        // when
+        parkingLot.freeSpot(spotNumber);
+
+        // then
+        MatcherAssert.assertThat(parkingLot.availableParkingSpotFor(type), IsEqual.equalTo(2));
+        MatcherAssert.assertThat(parkingLot.findAvailableSpot(type), IsEqual.equalTo(0));
+    }
 
 }
