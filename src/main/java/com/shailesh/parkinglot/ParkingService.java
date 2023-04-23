@@ -13,26 +13,28 @@ import java.time.LocalDateTime;
 public class ParkingService {
 
     private final ParkingLot parkingLot;
-    private final IdGenerator idGenerator;
+    private final IdGenerator ticketIdGenerator;
+    private final IdGenerator recieptIdGenerator;
     private final FeeCalculator feeCalculator;
 
-    public ParkingService(ParkingLot parkingLot, IdGenerator idGenerator, FeeCalculator feeCalculator) {
+    public ParkingService(ParkingLot parkingLot, IdGenerator ticketIdGenerator, IdGenerator recieptIdGenerator, FeeCalculator feeCalculator) {
         this.parkingLot = parkingLot;
-        this.idGenerator = idGenerator;
+        this.ticketIdGenerator = ticketIdGenerator;
+        this.recieptIdGenerator = recieptIdGenerator;
         this.feeCalculator = feeCalculator;
     }
 
     public Ticket park(VehicleType vehicleType, LocalDateTime entryTime) {
         Integer parkingSpot = parkingLot.findAvailableSpot(vehicleType);
         parkingLot.bookSpot(parkingSpot, vehicleType);
-        return new Ticket(idGenerator.nextId(), entryTime, parkingSpot, vehicleType);
+        return new Ticket(ticketIdGenerator.nextId(), entryTime, parkingSpot, vehicleType);
     }
 
     public Reciept unPark(Ticket ticket, LocalDateTime exitTime){
         parkingLot.freeSpot(ticket.getSpotNumber());
         double feesToBePaid = feeCalculator.calculate(ticket.getEntryTime(), exitTime, ticket.getType());
         return RecieptBuilder.builder()
-                        .setId(String.format("R-%s",ticket.getId()))
+                        .setId(String.format("R-%s",recieptIdGenerator.nextId()))
                         .setEntryTime(ticket.getEntryTime())
                         .setExitTime(exitTime)
                         .setFees(feesToBePaid)

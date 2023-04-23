@@ -37,12 +37,12 @@ public class ParkingLot {
         return vehicleTypeSpotMap.get(vehicleType);
     }
 
-    public boolean IsSpotAvailable(Integer index) {
+    public boolean isSpotAvailable(Integer index) {
         return spotIndexMap.get(index).available();
     }
 
     public void bookSpot(Integer availableSpot, VehicleType vehicleType) {
-        if (!IsSpotAvailable(availableSpot)) {
+        if (!isSpotAvailable(availableSpot)) {
             throw new BookingNotPossible(String.format("[Thread-%s] Race condition Spot of type %s booked already.", Thread.currentThread().getName(), vehicleType.name()));
         }
         Spot spot = spotIndexMap.get(availableSpot);
@@ -65,6 +65,6 @@ public class ParkingLot {
     public void freeSpot(Integer spotNumber) {
         Spot spot = spotIndexMap.get(spotNumber);
         spot.free();
-        vehicleTypeSpotMap.computeIfPresent(spot.getType(), (vehicleType, availableSpots) -> availableSpots+1);
+        vehicleTypeSpotMap.compute(spot.getType(), (vehicleType, availableSpots) -> availableSpots+1);
     }
 }

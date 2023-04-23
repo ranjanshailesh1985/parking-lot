@@ -25,9 +25,10 @@ public class ParkingServiceIntegrationTest {
     ParkingService parkingService;
     ParkingLot mall;
 
-    IdGenerator idGenerator;
-
     FeeCalculator feeCalculator;
+
+    IdGenerator ticketIdGenrator = new IdGenerator(1, FORMAT);
+    IdGenerator reciptIdGenrator = new IdGenerator(1, FORMAT);
 
     @Test
     public void shouldGenerateParkingTicketWithEntryTimeAndVehicleType() {
@@ -37,8 +38,8 @@ public class ParkingServiceIntegrationTest {
                         .setMotorCyclesScootersParkingSpot(100)
                         .setBusTruksParkingSpot(40)
                         .build();
-        idGenerator = new IdGenerator(1, FORMAT);
-        parkingService = new ParkingService(mall, idGenerator, feeCalculator);
+
+        parkingService = new ParkingService(mall, ticketIdGenrator, reciptIdGenrator, feeCalculator);
 
         VehicleType firstVehicle = VehicleType.CAR_SUV;
         LocalDateTime firstVehicleEntryTime = LocalDateTime.now();
@@ -78,8 +79,7 @@ public class ParkingServiceIntegrationTest {
         mall = ParkingLotBuilder.builder()
                         .setCarSuvParkingSpot(1)
                         .build();
-        idGenerator = new IdGenerator(1, FORMAT);
-        parkingService = new ParkingService(mall, idGenerator, feeCalculator);
+        parkingService = new ParkingService(mall, ticketIdGenrator, reciptIdGenrator, feeCalculator);
         VehicleType carSuv = VehicleType.CAR_SUV;
         parkingService.park(carSuv, LocalDateTime.now());
         LocalDateTime entryTime = LocalDateTime.now();
@@ -101,13 +101,11 @@ public class ParkingServiceIntegrationTest {
         mall = ParkingLotBuilder.builder()
                         .setCarSuvParkingSpot(80)
                         .build();
-        idGenerator = new IdGenerator(1, FORMAT);
-
         FeePolicyPerHour feePolicyPerHourForCarSuv = new FeePolicyPerHour(0, Integer.MAX_VALUE, VehicleType.CAR_SUV, 20.0);
         FeePolicyPerHour feePolicyPerHourForBusTruck = new FeePolicyPerHour(0, Integer.MAX_VALUE, VehicleType.BUS_TRUCK, 50.0, feePolicyPerHourForCarSuv);
         FeePolicyPerHour feePolicyPerHourMotorCycleScooter = new FeePolicyPerHour(0, Integer.MAX_VALUE, VehicleType.MOTORCYCLE_SCOOTER, 10.0, feePolicyPerHourForBusTruck);
         feeCalculator = new FeeCalculator(feePolicyPerHourMotorCycleScooter);
-        parkingService = new ParkingService(mall, idGenerator, feeCalculator);
+        parkingService = new ParkingService(mall, ticketIdGenrator, reciptIdGenrator, feeCalculator);
         LocalDateTime entryTime = LocalDateTime.now().minus(10, ChronoUnit.MINUTES);
         Ticket ticket = parkingService.park(VehicleType.CAR_SUV, entryTime);
         LocalDateTime exitTime = LocalDateTime.now();
@@ -116,6 +114,7 @@ public class ParkingServiceIntegrationTest {
         Reciept reciept = parkingService.unPark(ticket, exitTime);
 
         // then
+        MatcherAssert.assertThat(reciept.getId(), IsEqual.equalTo("R-001"));
         MatcherAssert.assertThat(reciept.getExitTime(), IsEqual.equalTo(exitTime));
         MatcherAssert.assertThat(reciept.getEntryTime(), IsEqual.equalTo(entryTime));
         MatcherAssert.assertThat(reciept.getFees(), IsEqual.equalTo(20.0));

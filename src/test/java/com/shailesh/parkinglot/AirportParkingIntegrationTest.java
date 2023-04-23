@@ -25,7 +25,8 @@ public class AirportParkingIntegrationTest {
 
     @Before
     public void setUp(){
-        IdGenerator idGenerator = new IdGenerator(1, FORMAT);
+        IdGenerator ticketIdGenrator = new IdGenerator(1, FORMAT);
+        IdGenerator reciptIdGenrator = new IdGenerator(1, FORMAT);
         FeePolicyFlatRateWithoutSumming feePolicyBetweenZeroAndOneHour = new FeePolicyFlatRateWithoutSumming(0, 1,
                         VehicleType.MOTORCYCLE_SCOOTER, 0.0);
         FeePolicyFlatRateWithoutSumming feePolicyBetweenOneAndEightHour = new FeePolicyFlatRateWithoutSumming(1, 8,
@@ -53,7 +54,7 @@ public class AirportParkingIntegrationTest {
                         .setCarSuvParkingSpot(500)
                         .setBusTruksParkingSpot(100)
                         .build();
-        parkingService = new ParkingService(airport, idGenerator, feeCalculator);
+        parkingService = new ParkingService(airport, ticketIdGenrator, reciptIdGenrator, feeCalculator);
     }
 
     @Test

@@ -2,8 +2,6 @@ package com.shailesh.parkinglot;
 
 import com.shailesh.parkinglot.fee.FeeCalculator;
 import com.shailesh.parkinglot.fee.model.Reciept;
-import com.shailesh.parkinglot.fee.policy.FeePolicyFlatRateWithoutSumming;
-import com.shailesh.parkinglot.fee.policy.FeePolicyPerDay;
 import com.shailesh.parkinglot.fee.policy.FeePolicyPerHour;
 import com.shailesh.parkinglot.parking.IdGenerator;
 import com.shailesh.parkinglot.parking.ParkingLot;
@@ -26,7 +24,8 @@ public class MallParkingIntegrationTest {
 
     @Before
     public void setUp(){
-        IdGenerator idGenerator = new IdGenerator(1, FORMAT);
+        IdGenerator ticketIdGenrator = new IdGenerator(1, FORMAT);
+        IdGenerator reciptIdGenrator = new IdGenerator(1, FORMAT);
 
         FeePolicyPerHour
                         feePolicyPerHourForCarSuv = new FeePolicyPerHour(0, Integer.MAX_VALUE, VehicleType.CAR_SUV, 20.0);
@@ -40,7 +39,7 @@ public class MallParkingIntegrationTest {
                         .setCarSuvParkingSpot(80)
                         .setBusTruksParkingSpot(10)
                         .build();
-        parkingService = new ParkingService(airport, idGenerator, feeCalculator);
+        parkingService = new ParkingService(airport, ticketIdGenrator, reciptIdGenrator, feeCalculator);
     }
 
     @Test

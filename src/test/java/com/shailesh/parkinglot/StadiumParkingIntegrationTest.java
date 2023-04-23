@@ -26,7 +26,8 @@ public class StadiumParkingIntegrationTest {
 
     @Before
     public void setUp() {
-        IdGenerator idGenerator = new IdGenerator(1, FORMAT);
+        IdGenerator ticketIdGenrator = new IdGenerator(1, FORMAT);
+        IdGenerator reciptIdGenrator = new IdGenerator(1, FORMAT);
 
         FeePolicyForDurations feePolicyBetweenZeroAndFourHourForMotorCycle = new FeePolicyForDurations(0, 4,
                         VehicleType.MOTORCYCLE_SCOOTER, 30.0);
@@ -52,7 +53,7 @@ public class StadiumParkingIntegrationTest {
                         .setMotorCyclesScootersParkingSpot(1000)
                         .setCarSuvParkingSpot(1500)
                         .build();
-        parkingService = new ParkingService(stadium, idGenerator, feeCalculator);
+        parkingService = new ParkingService(stadium, ticketIdGenrator, reciptIdGenrator, feeCalculator);
     }
 
     @Test

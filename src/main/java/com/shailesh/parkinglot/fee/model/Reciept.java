@@ -27,4 +27,8 @@ public class Reciept {
     public Double getFees() {
         return this.fees;
     }
+
+    public String getId() {
+        return this.id;
+    }
 }

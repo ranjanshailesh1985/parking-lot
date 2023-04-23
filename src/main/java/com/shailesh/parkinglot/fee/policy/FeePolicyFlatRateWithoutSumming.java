@@ -33,9 +33,6 @@ public class FeePolicyFlatRateWithoutSumming extends FeePolicyForDurations imple
     public double applyRate(Duration duration, VehicleType type) {
         double roundUpHours = DurationUtility.getRoundUpHours(duration);
         if(roundUpHours> cutOffStartHour && roundUpHours<=cutOffEndHour){
-//            double multiplier = roundUpHours/cutOffStartHour;
-//            multiplier = Math.ceil(multiplier);
-//            return fee*multiplier;
             return fee;
         }
         return 0.0;
