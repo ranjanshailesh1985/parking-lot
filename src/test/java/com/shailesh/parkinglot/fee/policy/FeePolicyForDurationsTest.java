@@ -1,7 +1,6 @@
 package com.shailesh.parkinglot.fee.policy;
 
 import com.shailesh.parkinglot.fee.FeePolicy;
-import com.shailesh.parkinglot.fee.policy.FeePolicyForDurations;
 import com.shailesh.parkinglot.parking.model.VehicleType;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;

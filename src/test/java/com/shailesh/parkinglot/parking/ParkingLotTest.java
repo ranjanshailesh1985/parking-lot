@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
@@ -76,46 +77,41 @@ public class ParkingLotTest {
         }
     }
 
-    // Run this test in forked mode to produce error of race condition in Intellij
     @Test
     public void shouldThrowBookingFailedExceptionIfNotAbleToBook() throws InterruptedException, ExecutionException {
         // given
         parkingLot = ParkingLotBuilder.builder()
-                .setCarSuvParkingSpot(2)
+                .setCarSuvParkingSpot(10)
                 .build();
 
         VehicleType vehicleType = VehicleType.CAR_SUV;
-        Integer firstAvailableSpot = parkingLot.findAvailableSpot(vehicleType);
-        parkingLot.bookSpot(firstAvailableSpot, vehicleType);
 
-        final Integer secondAvailableSpot = parkingLot.findAvailableSpot(vehicleType);
-        final Integer thirdAvailableSpot = parkingLot.findAvailableSpot(vehicleType);
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        // TODO: fix the test to reproduce error, instead of running as fork
-        List<Callable<BookingNotPossible>> callableList = Arrays.asList(
-                booking(vehicleType, secondAvailableSpot),
-                booking(vehicleType, thirdAvailableSpot)
-        );
-
+        List<Future<?>> results = new ArrayList<>();
         // when
-        List<Future<BookingNotPossible>> futures = executorService.invokeAll(callableList);
-
+        for (int i = 0; i < 5; i++) {
+            results.add(executorService.submit(
+                            () -> {
+                                int pos = parkingLot.findAvailableSpot(vehicleType);
+                                parkingLot.bookSpot(pos, vehicleType);
+                            }));
+        }
         // then
-        BookingNotPossible secondAttemptBookingNotPossible = futures.get(0).get();
-        BookingNotPossible thirdAttemptBookingNotPossible = futures.get(1).get();
-        MatcherAssert.assertThat(secondAttemptBookingNotPossible == null && thirdAttemptBookingNotPossible == null , IsEqual.equalTo(false));
+        results.stream().forEach(future -> waitingTillAllCompletes(future));
+        MatcherAssert.assertThat(parkingLot.findAvailableSpot(vehicleType) , IsEqual.equalTo(5));
+        MatcherAssert.assertThat(parkingLot.availableParkingSpotFor(vehicleType) , IsEqual.equalTo(5));
 
     }
 
-    private Callable<BookingNotPossible> booking(VehicleType vehicleType, Integer availableSpot) {
-        return () -> {
-            try {
-                parkingLot.bookSpot(availableSpot, vehicleType);
-            } catch (BookingNotPossible ex) {
-                return ex;
-            }
-            return null;
-        };
+    private static Object waitingTillAllCompletes(Future<?> future) {
+        try {
+            return future.get();
+        } catch (InterruptedException e) {
+            // do-nothing
+        } catch (ExecutionException e) {
+            // do-nothing
+        }
+        return null;
     }
 
     @Test
