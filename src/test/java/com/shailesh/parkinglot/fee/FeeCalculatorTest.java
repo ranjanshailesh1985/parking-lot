@@ -1,6 +1,6 @@
 package com.shailesh.parkinglot.fee;
 
-import com.shailesh.parkinglot.fee.policy.mall.MallFeePolicy;
+import com.shailesh.parkinglot.fee.policy.FeePolicyPerHour;
 import com.shailesh.parkinglot.parking.model.VehicleType;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -9,8 +9,6 @@ import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
 
 public class FeeCalculatorTest {
 
@@ -18,11 +16,10 @@ public class FeeCalculatorTest {
 
     @Before
     public void init(){
-        Map<VehicleType, Double> mallFeeTable = new HashMap<>();
-        mallFeeTable.put(VehicleType.CAR_SUV, 20.0);
-        mallFeeTable.put(VehicleType.MOTORCYCLE_SCOOTER, 10.0);
-        mallFeeTable.put(VehicleType.BUS_TRUCK, 50.0);
-        feeCalculator = new FeeCalculator(new MallFeePolicy(mallFeeTable));
+        FeePolicyPerHour feePolicyPerHourForCarSuv = new FeePolicyPerHour(0, Integer.MAX_VALUE, VehicleType.CAR_SUV, 20.0);
+        FeePolicyPerHour feePolicyPerHourForBusTruck = new FeePolicyPerHour(0, Integer.MAX_VALUE, VehicleType.BUS_TRUCK, 50.0, feePolicyPerHourForCarSuv);
+        FeePolicyPerHour feePolicyPerHourMotorCycleScooter = new FeePolicyPerHour(0, Integer.MAX_VALUE, VehicleType.MOTORCYCLE_SCOOTER, 10.0, feePolicyPerHourForBusTruck);
+        feeCalculator = new FeeCalculator(feePolicyPerHourMotorCycleScooter);
     }
 
     @Test

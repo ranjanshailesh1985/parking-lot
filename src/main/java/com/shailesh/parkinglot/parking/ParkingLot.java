@@ -6,13 +6,14 @@ import com.shailesh.parkinglot.parking.model.Spot;
 import com.shailesh.parkinglot.parking.model.VehicleType;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ParkingLot {
 
     private final Map<Integer, Spot> spotIndexMap;
-    private final Map<VehicleType, Integer> vehicleTypeSpotMap;
+    private final ConcurrentHashMap<VehicleType, Integer> vehicleTypeSpotMap;
 
-    public ParkingLot(Map<Integer, Spot> spotIndexMap, Map<VehicleType, Integer> vehicleTypeSpotMap) {
+    public ParkingLot(Map<Integer, Spot> spotIndexMap, ConcurrentHashMap<VehicleType, Integer> vehicleTypeSpotMap) {
         this.spotIndexMap = spotIndexMap;
         this.vehicleTypeSpotMap = vehicleTypeSpotMap;
     }
@@ -64,7 +65,6 @@ public class ParkingLot {
     public void freeSpot(Integer spotNumber) {
         Spot spot = spotIndexMap.get(spotNumber);
         spot.free();
-        Integer availableSpot = vehicleTypeSpotMap.get(spot.getType());
-        vehicleTypeSpotMap.put(spot.getType(), availableSpot+1);
+        vehicleTypeSpotMap.computeIfPresent(spot.getType(), (vehicleType, availableSpots) -> availableSpots+1);
     }
 }

@@ -1,12 +1,12 @@
 package com.shailesh.parkinglot;
 
+import com.shailesh.parkinglot.fee.FeeCalculator;
+import com.shailesh.parkinglot.fee.model.Reciept;
+import com.shailesh.parkinglot.fee.model.RecieptBuilder;
 import com.shailesh.parkinglot.parking.IdGenerator;
 import com.shailesh.parkinglot.parking.ParkingLot;
 import com.shailesh.parkinglot.parking.model.Ticket;
 import com.shailesh.parkinglot.parking.model.VehicleType;
-import com.shailesh.parkinglot.fee.FeeCalculator;
-import com.shailesh.parkinglot.fee.model.Reciept;
-import com.shailesh.parkinglot.fee.model.RecieptBuilder;
 
 import java.time.LocalDateTime;
 

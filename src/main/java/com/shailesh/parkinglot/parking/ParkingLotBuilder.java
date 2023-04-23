@@ -4,10 +4,11 @@ import com.shailesh.parkinglot.parking.model.Spot;
 import com.shailesh.parkinglot.parking.model.VehicleType;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ParkingLotBuilder {
 
-    private HashMap<VehicleType, Integer> vehicleTypeSpotMap = new HashMap<>();
+    private ConcurrentHashMap<VehicleType, Integer> vehicleTypeSpotMap = new ConcurrentHashMap<>();
 
     private HashMap<Integer, Spot> spotIndexMap = new HashMap<>();
 
